@@ -56,9 +56,9 @@ All stages accept ordinary text, links and files. Include relevant discussion, c
 | Stage | Question it answers | Useful input | Output to carry forward |
 | --- | --- | --- | --- |
 | **Triage** | Is this ready for the named next stage? | Request, discussion, current evidence and target stage | Readiness, cited rationale, missing information, decisions and dependencies |
-| **Refinement** | What should users experience? | Triaged request, code context and any replies | One clarification-comment draft, or structured requirements with acceptance criteria and open decisions |
-| **Planning** | How should we make and verify the change? | Refined requirements, constraints and current code | Scoped technical approach, dependencies, risks and verification plan |
-| **Implementation** | Does the authorized change deliver that behavior? | Agreed criteria, appropriate plan and edit scope | Reviewable changes, check results and remaining risks |
+| **Refine** | What should users experience? | Triaged request, code context and any replies | One clarification-comment draft, or structured requirements with acceptance criteria and open decisions |
+| **Plan** | How should we make and verify the change? | Refined requirements, constraints and current code | Scoped technical approach, dependencies, risks and verification plan |
+| **Implement** | Does the authorized change deliver that behavior? | Agreed criteria, appropriate plan and edit scope | Reviewable changes, check results and remaining risks |
 | **Review** | Does this final version meet the agreement? | Requirements, final diff and verification evidence | Actionable findings, acceptance assessment and limits |
 | **Document** | Do the project's docs match the reviewed change? | Requirements, decisions, final code and review results | Updated existing docs, files left unchanged, missing destinations |
 | **Submit** | Is the branch ready for people to review as a pull request? | Finished, reviewed branch and summary; the person's approval | Pushed branch and a draft pull request link |
