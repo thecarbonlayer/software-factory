@@ -107,11 +107,7 @@ codex plugin add software-factory@thecarbonlayer
 codex plugin list --json
 ```
 
-This installs the skills; nothing else is needed. Releases before 0.7.0 asked you to copy `.codex/agents/*.toml` files into each consumer project. Those copies are no longer used and can be deleted.
-
-Keep the plugin enabled for the user, so the stages the factory starts find the skills by name.
-
-If you installed the early `software-factory-triage` identity, remove that old entry through your host's normal controls before installing `software-factory`.
+This installs the skills; nothing else is needed. 
 
 ## Run the stages automatically
 
@@ -175,22 +171,6 @@ Skills use the `software-factory:` namespace:
 | Code review | review + [review-code](skills/review-code/SKILL.md) |
 | Main session only | [submit](skills/submit/SKILL.md), [factory](skills/factory/SKILL.md) |
 
-### Renamed stages
-
-Older releases used longer names. Releases 0.6.0 and earlier also had named agents (the last column); 0.7.0 removed them. Update consumer notes that name them, and delete copied `.codex/agents/*.toml` files.
-
-| Old skill | New skill | Old agent | 0.6.0 agent (removed in 0.7.0) |
-| --- | --- | --- | --- |
-| triage-readiness | triage | triage | triager |
-| requirements-refinement | refine | refinement | refiner |
-| implementation-planning | plan | planning | planner |
-| behavior-driven-implementation | implement | implementation | implementer |
-| acceptance-review | review | review | reviewer |
-| code-review | review-code | code-review | code-reviewer |
-| security-review | review-security | security-review | security-reviewer |
-| ux-review | review-ux | ux-review | ux-reviewer |
-| (new) | document | (new) | documenter |
-| (new) | submit | | |
 
 ```text
 plugin.json                          Portable metadata
@@ -205,21 +185,6 @@ skills/factory/                      Orchestration skill (start, continue, statu
 
 The repository root is the plugin; the marketplace catalogs live in [thecarbonlayer/plugins](https://github.com/thecarbonlayer/plugins). Contributor guidance and authoring references live in [AGENTS.md](AGENTS.md); [CLAUDE.md](CLAUDE.md) imports that same guidance.
 
-## Current baseline
-
-Version **0.2.0** has passed basic metadata, catalog, definition, skill-reference and link checks, plus isolated installation and exposure of all five skills in Codex 0.159.0-alpha.3. Behavioral evaluation is deferred: the earlier Codex pilot encountered a model-endpoint proxy 403, and Claude Code was unavailable. Native execution and desktop integration are not yet verified. The next learning step is to use the stages on real work and improve what fails.
-
-Version **0.3.0** adds the three focused reviewers and changes from replaying one real, already-shipped issue through triage, refinement and planning, scored against what actually shipped. Each change was checked with one run per version, mostly through general-purpose subagents given the skill text, so these are likely improvements, not proof. Commit messages record each check and its limits.
-
-Version **0.4.0** adds the `factory` orchestration skill. It was developed with two test iterations on a small fixture repository (clear request, vague request, resume in a new session); one run per test, so treat the results as early evidence.
-
-Version **0.5.0** adds reconciliation of existing consumer context files, traces the original request through refinement and final review, and protects task progress across repeated starts, fix reviews, shared test resources and resume. It also permits bounded error recovery, verifies doubtful handoff evidence, uses normal UX entry points, and follows the project's migration recovery policy while retaining read-only triage and main-session orchestration.
-
-Validation covers plugin/marketplace metadata, skill format, JSON/TOML syntax, references and whitespace. Isolated filesystem/Git checks exercised atomic task reservation, preservation of task artifacts and detection of branch/commit/file changes. Independent scenarios exercised context reconciliation, final-review selection, shared-resource scheduling, resume, recovery and the wording changes. These are limited checks and scenarios, not native end-to-end validation of 0.5.0 or evidence of improved model performance.
-
-Version **0.6.0** renames the stages: skills are verbs (`triage`, `refine`, `plan`, `implement`, `review`) and agents are roles (`triager`, `refiner`, `planner`, `implementer`, `reviewer`); see [Renamed stages](#renamed-stages). A `documenter` agent now updates the project's existing documentation once, after the last code review, and the reviewer checks that diff. A `submit` skill pushes the task branch and opens a draft pull request when the person approves it, or when the consumer's own instructions opt in; it never merges. Task artifacts are shorter: one review file per round with a merged findings table, and `state.md` and `summary.md` open with what the person must decide. It was shaped by reviewing one real run on a consumer project. Checks cover plugin and marketplace validation, JSON/TOML syntax, relative links and whitespace; the new and renamed stages have not yet run on a real task.
-
-Version **0.7.0** removes the named agent definitions (`agents/*.md` and `.codex/agents/*.toml`). Each stage skill now opens with the role and boundaries those agents held. The factory runs each stage as its own `claude -p` or `codex exec` call with a read-only, checks or edit permission profile, and falls back to a generic subagent when the CLI is not available. One plugin now works the same in both hosts, and Codex consumers no longer copy agent files. Evidence: before the change, a headless `codex exec -s read-only` run (codex-cli 0.162.0-alpha.17.2) loaded the installed `triage` skill by `$software-factory:triage` mention and returned a correct assessment of a real consumer issue without agent files. The matching Claude Code run did not reach the model because the CLI login had expired. A full factory run with CLI dispatch has not run in either host.
 
 ## Qualify the plugin
 
@@ -242,7 +207,7 @@ PY
 git diff --check
 ```
 
-Manually check changed skill links and native skill references. Use the host installation steps above for loading checks, and exercise changed guidance on a scoped real task or isolated scenario for behavioral evidence. For context reconciliation, inspect the documentation diff and task-log delivery status as well as code; review any dropped original requirement explicitly. Keep drafts and evaluation artifacts local. Record which agent harness, version and checks were used, and distinguish a simulation or supplied skill text from native plugin execution. [Current baseline](#current-baseline) lists the known runtime limits.
+Manually check changed skill links and native skill references. Use the host installation steps above for loading checks, and exercise changed guidance on a scoped real task or isolated scenario for behavioral evidence. For context reconciliation, inspect the documentation diff and task-log delivery status as well as code; review any dropped original requirement explicitly. Keep drafts and evaluation artifacts local. Record which agent harness, version and checks were used, and distinguish a simulation or supplied skill text from native plugin execution. 
 
 ## Standards and authoring practices
 
