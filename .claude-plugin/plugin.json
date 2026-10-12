@@ -1,0 +1,5 @@
+{
+  "name": "software-factory",
+  "version": "0.7.0",
+  "description": "Software Factory stage skills and an orchestrator for triage, refinement, planning, implementation, review, documentation and submitting a draft pull request."
+}
