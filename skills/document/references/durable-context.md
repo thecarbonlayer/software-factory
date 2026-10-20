@@ -2,9 +2,13 @@
 
 Use this after the change has passed code review, to bring existing documentation up to date. Prepare documentation in the same authorized task worktree as the code. For a manual stage, use the caller's authorized checkout. Detailed drafts and review iterations stay in the locally excluded `.factory/<task-id>/` when factory is running, or in the caller's designated local artifacts for a manual stage.
 
+The issue owns shared intent and clarified requirements when one exists, and the PR owns the shared delivery record. Local `intent.md`, `spec.md`, `plan.md`, intermediate reports and raw logs support resume and review. Do not commit per-task copies or task directories to the consumer repository. For ad hoc work without an issue, the PR carries the necessary intent and accepted scope. Existing durable project documents change only where the reviewed work changes knowledge those documents own.
+
 ## Discover existing destinations
 
 Find destinations as the document skill describes; do not assume a layout. When recommending names, prefer `README.md`, a root `DECISIONS.md`, and a tracked `TASK_LOG.md` as names to recommend; reuse existing equivalents and their locations and formats. A decisions file or task log elsewhere is an equivalent, not a reason to create a second one. Missing files are reported as context gaps; this convention does not authorize creating them. Respect a narrower edit scope or repository policy and report any updates it prevents.
+
+Discover applicable `REVIEW.md` files. They own review passes, severity meanings, evidence expectations, exclusions and noise limits. Link to that owner from a context index when useful; do not duplicate its policy in `AGENTS.md`, a PR or task artifacts. When none exists, use the factory's review policy without creating `REVIEW.md` unless the authorized consumer change establishes durable review guidance. Report conflicting policies rather than silently rewriting them.
 
 ## Reconcile from the job's evidence
 
@@ -15,9 +19,11 @@ Use the original request/spec, refinement and sourced replies, plan, final imple
 | README or product guide | Resulting product behavior, usage and relevant limitations. Describe what the change provides; do not imply it has shipped. |
 | Decision records | Decisions actually agreed or made within the caller's delegated authority, with their source and rationale. Preserve prior entries. A proposed policy reversal needs explicit owner agreement; record an agreed supersession according to the project's format instead of rewriting history. |
 | Tracked task log | Concise completed work, task branch, verification results and remaining limitations. Distinguish work completed on the branch from reviewed, merged or deployed work. Preserve earlier entries; revise this job's entry as review or fixes change its result. |
-| AGENTS.md | Durable operating instructions and a concise context index, plus how to qualify/test the product. Keep task history and per-run outcomes in the log and local artifacts. |
+| AGENTS.md | Durable operating instructions and a concise context index, plus how to qualify/test the product. Link to REVIEW.md for review policy. Keep task history and per-run outcomes in the log and local artifacts. |
 
 Ordinary implementation proposes new decision wording rather than changing recorded policy. **Durable-context reconciliation** may record a supported decision only when that documentation edit is in scope and the evidence establishes agreement or delegated decision authority. A recommendation in a plan, silence or a passing test is not agreement. Keep unresolved proposals in task artifacts and report them as open decisions.
+
+Trace each recorded material decision to its stable `D-001` ID and source in the handoff, along with affected R IDs when useful. Preserve authority exactly: **user-agreed** requires an explicit user requirement or agreement; **delegated implementation choice** requires a named delegation and a choice within its limits; **unresolved proposal** remains outside tracked decisions. Do not relabel a delegated choice as user-decided. Use each destination's existing format and accessible sources for durable prose; local `.factory` links cannot serve as shared evidence. Reference the issue, PR, commit, code or a concise observed result with the tested revision and limitation instead. IDs aid traceability without turning the durable document into a copy of the task specification.
 
 ## Instruction files and product checks
 

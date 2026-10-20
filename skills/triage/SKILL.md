@@ -25,7 +25,7 @@ Use the request, relevant conversation, project rules and repository context ava
 
 ## Return a concise assessment
 
-Use the format in [the assessment format](references/assessment-format.md). Lead with readiness and the primary blocker, if any; explicitly say none when ready, and include other independently blocking items when present. Mark how much of each source you read, and keep conclusions to what you read.
+Start with the loaded skill declaration, then `Stage state: complete` after all stage-owned work has joined, or `Stage state: pending` with named running checks or child jobs. A complete report can be blocked or limited; it does not assert readiness. Use the format in [the assessment format](references/assessment-format.md). Lead with readiness and the primary blocker, if any; explicitly say none when ready, and include other independently blocking items when present. Mark how much of each source you read, and keep conclusions to what you read.
 
 If runtime, authentication or source access fails so the assessment cannot be completed, say that the assessment could not be completed and why. Do not classify a tool failure as a project dependency or invent a readiness judgment.
 
