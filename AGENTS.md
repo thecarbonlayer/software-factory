@@ -28,7 +28,7 @@
 From the repository root:
 
 - Claude Code: `claude plugin validate .`
-- Codex: after pushing, `codex plugin marketplace add thecarbonlayer/plugins`, `codex plugin add software-factory@thecarbonlayer`, then `codex plugin list --json` shows the new version. If `codex` is not on PATH, use the CLI bundled with the ChatGPT app.
+- Codex: after pushing, `codex plugin marketplace add thecarbonlayer/plugin-marketplace`, `codex plugin add software-factory@thecarbonlayer`, then `codex plugin list --json` shows the new version. If `codex` is not on PATH, use the CLI bundled with the ChatGPT app.
 - `git diff --check`
 
 Report command exits and warnings separately from behavioral evidence, and say which harness each behavior claim was checked in.

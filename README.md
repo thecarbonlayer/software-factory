@@ -6,7 +6,7 @@ The goal is to use these pieces on real work, observe where they fall short and 
 
 ## What lives here
 
-This repository is the **Software Factory plugin**. It is listed in the [thecarbonlayer marketplace](https://github.com/thecarbonlayer/plugins), the catalog through which a host discovers installable plugins. The plugin contains nine stage skills, a submit skill and an orchestrator skill. Your own project is the **consumer**: it supplies the request, code, project rules and access to relevant discussion.
+This repository is the **Software Factory plugin**. It is listed in the [thecarbonlayer marketplace](https://github.com/thecarbonlayer/plugin-marketplace), the catalog through which a host discovers installable plugins. The plugin contains nine stage skills, a submit skill and an orchestrator skill. Your own project is the **consumer**: it supplies the request, code, project rules and access to relevant discussion.
 
 ```mermaid
 flowchart LR
@@ -88,12 +88,12 @@ Refinement traces each material original request/spec item to an agreed criterio
 
 ## Install in your host
 
-Add the [thecarbonlayer marketplace](https://github.com/thecarbonlayer/plugins), then install the plugin from it.
+Add the [thecarbonlayer marketplace](https://github.com/thecarbonlayer/plugin-marketplace), then install the plugin from it.
 
 ### Claude Code
 
 ```text
-/plugin marketplace add thecarbonlayer/plugins
+/plugin marketplace add thecarbonlayer/plugin-marketplace
 /plugin install software-factory@thecarbonlayer
 ```
 
@@ -102,7 +102,7 @@ Check that the `software-factory:` skills appear, for example `/software-factory
 ### Codex
 
 ```bash
-codex plugin marketplace add thecarbonlayer/plugins
+codex plugin marketplace add thecarbonlayer/plugin-marketplace
 codex plugin add software-factory@thecarbonlayer
 codex plugin list --json
 ```
@@ -189,7 +189,7 @@ skills/factory/                      Orchestration skill (start, continue, statu
   references/task-folder.md          Task folder layout and state format
 ```
 
-The repository root is the plugin; the marketplace catalogs live in [thecarbonlayer/plugins](https://github.com/thecarbonlayer/plugins). Contributor guidance and authoring references live in [AGENTS.md](AGENTS.md); [CLAUDE.md](CLAUDE.md) imports that same guidance.
+The repository root is the plugin; the marketplace catalogs live in [thecarbonlayer/plugin-marketplace](https://github.com/thecarbonlayer/plugin-marketplace). Contributor guidance and authoring references live in [AGENTS.md](AGENTS.md); [CLAUDE.md](CLAUDE.md) imports that same guidance.
 
 
 ## Qualify the plugin
