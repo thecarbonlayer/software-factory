@@ -27,6 +27,7 @@
 
 From the repository root:
 
+- Repository quality: `python3 -m unittest discover -s tests`, then `python3 scripts/validate_repository.py --base-ref <target revision>`
 - Claude Code: `claude plugin validate .`
 - Codex: after pushing, `codex plugin marketplace add thecarbonlayer/plugin-marketplace`, `codex plugin add software-factory@thecarbonlayer`, then `codex plugin list --json` shows the new version. If `codex` is not on PATH, use the CLI bundled with the ChatGPT app.
 - `git diff --check`

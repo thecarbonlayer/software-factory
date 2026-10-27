@@ -203,24 +203,25 @@ The repository root is the plugin; the marketplace catalogs live in [thecarbonla
 
 ## Qualify the plugin
 
-This repository contains instructions and packaging, not a runnable consumer product. From the repository root, with Claude Code on PATH, validate the plugin:
+This repository contains instructions and packaging, not a runnable consumer product. Pull requests run the deterministic checks in [PR quality](.github/workflows/pr-quality.yml). The workflow does not call a model or require model credentials.
+
+Run the same repository-owned checks locally, replacing `origin/main` when the pull request targets another revision:
+
+```bash
+python3 -m unittest discover -s tests
+python3 scripts/validate_repository.py --base-ref origin/main
+git diff --check origin/main...HEAD
+```
+
+The repository validator checks JSON parsing, synchronized manifests, Agent Skills metadata, native skill references, relative Markdown links, version increases for plugin changes and accidental local workstation paths. It uses only the Python standard library.
+
+With Claude Code on PATH, also validate the plugin package:
 
 ```bash
 claude plugin validate .
 ```
 
-Validation can pass with metadata warnings. Read the exit status and warnings; validation does not prove native stage execution or behavioral quality. For a syntax smoke check:
-
-```bash
-python3 - <<'PY'
-import json
-from pathlib import Path
-for path in Path('.').rglob('*.json'):
-    json.loads(path.read_text())
-print('JSON parsed')
-PY
-git diff --check
-```
+Plugin validation can pass with metadata warnings. Read the exit status and warnings; validation does not prove native stage execution or behavioral quality.
 
 Manually check changed skill links and native skill references. Run the tracked [generic eval suite](evals/README.md) with the previous and candidate plugin versions, then qualify on a de-identified frozen consumer trace and a structurally different consumer or synthetic repository. Keep per-run transcripts, credentials and consumer data local. Record the agent harness, version and checks used, and distinguish a simulation or supplied skill text from native plugin execution.
 
