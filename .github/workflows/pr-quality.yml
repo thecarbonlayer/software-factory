@@ -1,0 +1,65 @@
+name: PR quality
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-quality-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate plugin repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out the candidate
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run validator tests
+        run: python3 -m unittest discover -s tests
+
+      - name: Validate repository against the pull request base
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: python3 scripts/validate_repository.py --base-ref "$BASE_SHA"
+
+      - name: Validate repository
+        if: github.event_name != 'pull_request'
+        run: python3 scripts/validate_repository.py
+
+      - name: Check patch whitespace
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: git diff --check "$BASE_SHA...HEAD"
+
+      - name: Set up Node.js for plugin validation
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install the pinned plugin validator
+        run: npm install --global @anthropic-ai/claude-code@2.1.220
+
+      - name: Validate plugin packaging
+        env:
+          DISABLE_AUTOUPDATER: "1"
+        run: |
+          claude --version
+          claude plugin validate .
