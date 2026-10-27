@@ -8,6 +8,8 @@ The goal is to use these pieces on real work, observe where they fall short and 
 
 This repository is the **Software Factory plugin**. It is listed in the [thecarbonlayer marketplace](https://github.com/thecarbonlayer/plugin-marketplace), the catalog through which a host discovers installable plugins. The plugin contains ten capability skills, a submit skill and an orchestrator skill. Your own project is the **consumer**: it supplies the request, code, project rules and access to relevant discussion.
 
+Software Factory is also a consumer of its own released plugin. Development of this repository uses the same Factory workflow described here. The installed stable release operates the task, while edited skills remain a candidate until they pass independent review, local behavioral qualification when applicable and deterministic PR verification. See [Developing Software Factory with Software Factory](docs/self-hosting.md).
+
 ```mermaid
 flowchart LR
     M["thecarbonlayer marketplace"] -->|lists| P["This repository: Software Factory plugin"]
@@ -64,7 +66,7 @@ All stages accept ordinary text, links and files. Include relevant discussion, c
 | **Document** | Do the project's docs match the implemented change? | Requirements, decisions, final code and implementation evidence | Updated existing docs, files left unchanged, missing destinations |
 | **Review** | Does this frozen code-and-docs candidate meet the agreement? | Requirements, final diff and evidence ledger | Independent findings, acceptance assessment and limits |
 | **Verify** | Does the frozen candidate pass the consumer's required checks and journeys? | Candidate, plan, capabilities, consumer policy, remote results and test guidance | Candidate-bound black-box results, evidence IDs and verification gaps |
-| **Submit** | May this reviewed candidate be published as a draft, including to trigger remote verification? | Reviewed branch, current evidence and the person's approval | Pushed branch, draft PR link and pending verification state |
+| **Submit** | May this reviewed candidate be published as a draft, including to trigger remote verification? | Reviewed branch, current evidence and publication authority from the person or consumer policy | Pushed branch, draft PR link and pending verification state |
 
 Triage defaults to assessing readiness for **pilot implementation** when no stage is specified. Name another stage when that is the decision you need. A failed investigation is reported separately from a request that is not ready.
 
@@ -136,7 +138,7 @@ The excluded `.factory/<task id>/` holds intent, accepted requirements, the plan
 
 `start` preserves existing tasks and reserves a new identity before writing artifacts. It authorizes implementation within the plan's scope. Independent checks can run in parallel only when their resources are isolated; otherwise they are serialized. `continue` compares saved branch, commit, worktree, capabilities, remote-check identity and check environment before resuming. It preserves unexpected changes and marks affected results stale.
 
-When configured remote checks own the full suite, the factory asks to publish a draft after independent review, then resumes verification from required jobs bound to the candidate head or a proven integration revision. Without suitable CI, it runs the documented local suite once before asking to submit. It fixes within two rounds, has already reconciled durable documentation, and stops for unresolved decisions or verification gaps. It never marks ready, merges or deploys. A later merge-queue run on a changed combined tree is new integration evidence, not a duplicate candidate-tree run.
+When configured remote checks own the full suite, the factory uses existing publication authority or asks for it after independent review, then publishes a draft and resumes verification from required jobs bound to the candidate head or a proven integration revision. Without suitable CI, it runs the documented local suite once before asking to submit when no publication authority already exists. It fixes within two rounds, has already reconciled durable documentation, and stops for unresolved decisions or verification gaps. It never marks ready, merges or deploys. A later merge-queue run on a changed combined tree is new integration evidence, not a duplicate candidate-tree run.
 
 No CI is a supported repository shape. Factory falls back to consumer-documented local automation, then meaningful manual checks. If neither exists, it reports the affected behavior as unverified and asks for the delivery-risk decision. It does not create CI or a test framework implicitly.
 
@@ -198,14 +200,21 @@ skills/factory/                      Orchestration skill (start, continue, statu
 evals/                               Generic behavioral scenarios and scoring rubric
 ```
 
-The repository root is the plugin; the marketplace catalogs live in [thecarbonlayer/plugin-marketplace](https://github.com/thecarbonlayer/plugin-marketplace). Contributor guidance and authoring references live in [AGENTS.md](AGENTS.md); [CLAUDE.md](CLAUDE.md) imports that same guidance.
+The repository root is the plugin; the marketplace catalogs live in [thecarbonlayer/plugin-marketplace](https://github.com/thecarbonlayer/plugin-marketplace). Contributor guidance and authoring references live in [AGENTS.md](AGENTS.md); [CLAUDE.md](CLAUDE.md) imports that same guidance. Repository-specific review and verification policy lives in [REVIEW.md](REVIEW.md).
+
+
+## Develop the Factory with the Factory
+
+For non-trivial changes to this repository, start with the installed `software-factory:factory` skill. It creates the same isolated task worktree and evidence boundary used for any consumer repository. `.factory/` is ignored so intent, plans, raw reports and local evaluation transcripts cannot enter a commit.
+
+The running task keeps its installed release. Candidate skills are loaded only by fresh sessions that are explicitly evaluating them. The deterministic `PR quality` job validates the submitted revision; behavioral evals run locally on a trusted machine when shipped skill behavior changes. Starting an authorized Factory task here includes authority to commit, push and open or update its draft after independent review, while ready state, approval, merge and deployment remain separately authorized. The complete lifecycle is in the [self-hosting guide](docs/self-hosting.md).
 
 
 ## Qualify the plugin
 
-This repository contains instructions and packaging, not a runnable consumer product. Pull requests run the deterministic checks in [PR quality](.github/workflows/pr-quality.yml). The workflow does not call a model or require model credentials.
+This repository contains instructions and packaging, not a runnable consumer product. Pull requests run the authoritative complete deterministic suite in [PR quality](.github/workflows/pr-quality.yml). The workflow does not call a model or require model credentials.
 
-Run the same repository-owned checks locally, replacing `origin/main` when the pull request targets another revision:
+During implementation, run the focused checks needed for the affected behavior. Once an authorized draft exists, let PR quality own the complete deterministic matrix rather than repeating it locally on the same candidate. To reproduce or diagnose that matrix locally, replace `origin/main` when the pull request targets another revision:
 
 ```bash
 python3 -m unittest discover -s tests
@@ -223,7 +232,7 @@ claude plugin validate .
 
 Plugin validation can pass with metadata warnings. Read the exit status and warnings; validation does not prove native stage execution or behavioral quality.
 
-Manually check changed skill links and native skill references. Run the tracked [generic eval suite](evals/README.md) with the previous and candidate plugin versions, then qualify on a de-identified frozen consumer trace and a structurally different consumer or synthetic repository. Keep per-run transcripts, credentials and consumer data local. Record the agent harness, version and checks used, and distinguish a simulation or supplied skill text from native plugin execution.
+When shipped skill behavior changes, run the tracked [generic eval suite](evals/README.md) locally on a trusted machine with configured coding agents. Compare the previous release and candidate, then qualify on a de-identified frozen consumer trace and a structurally different consumer or synthetic repository. Keep transcripts, credentials and consumer data local and commit only aggregate results. Documentation or infrastructure-only changes may skip behavioral execution when they record why shipped skill behavior is unchanged.
 
 ## Standards and authoring practices
 
