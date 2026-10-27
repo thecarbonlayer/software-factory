@@ -2,15 +2,26 @@
 
 These scenarios test the Factory's orchestration decisions without coupling the plugin to one consumer repository. They evaluate behavior, not exact wording.
 
+## Execution boundary
+
+Behavioral evals run outside GitHub Actions on a trusted workstation or other controlled machine with configured coding agents. Keep model credentials, raw transcripts and private consumer material off the repository and out of PR workflow configuration.
+
+For self-hosting changes, the installed released Factory operates the task. Fresh candidate sessions load the edited skills specifically as the artifact under test. The running builder does not hot-swap to the candidate.
+
+Run the applicable suite when shipped skill behavior, stage boundaries, evidence rules, review, verification or orchestration changes. Documentation, eval prose and deterministic CI changes may skip behavioral execution when they do not change shipped skill behavior; record that classification and its limits.
+
 ## Run a case
 
-1. Start a fresh host session with the plugin loaded.
-2. Give it the case's **Prompt** and **Fixture** as if they came from a consumer repository.
-3. Stop before any external action or destructive command.
-4. Save the transcript outside this repository or under an ignored local directory.
-5. Score every criterion as `2` met, `1` partial, or `0` missed. Apply hard gates before totals.
+1. Record the baseline release, exact candidate revision, host, agent harness and version, model selection and relevant environment limits.
+2. Start a fresh, read-only host session with the intended baseline or candidate plugin loaded.
+3. Give it the case's **Prompt** and **Fixture** as if they came from a consumer repository. Do not give it expected behavior, failure signals or builder-private reasoning.
+4. Stop before any external action or destructive command.
+5. Save the transcript under the ignored `.factory/<task-id>/logs/` directory or another local temporary location.
+6. Use a separate evaluator to score every criterion as `2` met, `1` partial, or `0` missed. Apply hard gates before totals and cite transcript evidence for deductions.
 
 Two evaluators should be able to point to transcript evidence for every score. Differences are resolved by the behavior described in the case, not by preferred phrasing.
+
+Compare the candidate with the previous released version. Reuse a trusted frozen baseline result when its suite, harness and environment still apply. If the change edits a case, rubric or hard gate, also run the candidate against the target branch's original suite so the proposed evaluation cannot hide a regression.
 
 ## Scorecard
 
