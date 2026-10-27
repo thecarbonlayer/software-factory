@@ -1,18 +1,20 @@
 ---
 name: review-ux
-description: Review a software change from the user's side by running it. Use with the review skill when a change alters screens, navigation, messages or what each role can do.
+description: Review a changed user experience from the diff, product contract and available evidence. Use with the review skill when screens, navigation, messages or role-visible behavior changed.
 ---
 
-# UX review
+# UX review lens
 
-Be a UX reviewer. Judge the change by using it as each intended role, with evidence from what you saw. Keep defects apart from suggestions, and never present an unexercised flow as checked. Running the project may need a writable environment; use it to run the app, not to edit source. Do not use real accounts. Stop any servers you started before you finish.
+Judge whether each intended user can find, understand and complete the changed flow. Keep defects apart from suggestions, and never present an unexercised flow as checked.
 
-Follow the review skill for scope, the version reviewed, finding format, limits and boundaries. This skill sets the focus: can each intended user find, understand and complete the changed flow. Leave the requirement-by-requirement trace to acceptance review; under acceptance and verification, report only the checks you ran and what they showed.
+Follow the review skill for independence, scope, version, finding format, evidence and boundaries. This skill adds a UX lens to the same reviewer context. The separate verify skill owns black-box execution of the consumer's complete role, persona and journey suites.
 
-1. Run the changed version locally with test data, using the project's documented setup and its existing browser tooling (for example its end-to-end framework) or the host's browser tools. If it cannot run, say why and fall back to reading the frontend diff and tests, marking every flow as not exercised.
-2. **Reach.** For each intended user or role in the requirements, start from their normal entry point, including login when applicable, and get to the changed feature through normal navigation. Record each step. A feature a user cannot reach is a defect even when its API allows the call.
-3. **Flows and states.** Walk the main flow and its other states: empty, loading, error, permission denied, already done, and the boundary cases in the acceptance criteria. Check that each state tells the user what happened and what to do next.
-4. **Wording and consistency.** Labels and messages are plain, match the requirement's terms and match existing screens. Read-only values look read-only. Destructive or irreversible actions say so before they happen.
-5. **Basics.** Keyboard access, visible focus, labels on inputs, readable contrast, and a narrow viewport on changed pages.
+1. **Reach.** Trace each intended role from its normal entry point to the changed feature through routes, navigation, permissions and state. A feature that has no supported path is a defect even when its API allows the call.
+2. **Flows and states.** Inspect the main path plus relevant empty, loading, error, permission-denied, already-complete and boundary states. Check that each state explains what happened and the next action.
+3. **Wording and consistency.** Labels and messages use the product's terms and existing patterns. Read-only values look read-only. Destructive or irreversible actions state their consequence before confirmation.
+4. **Interaction basics.** Inspect keyboard path, visible focus, input labels, semantic structure, contrast cues and narrow-layout behavior for changed UI.
+5. **Evidence.** Use current screenshots, artifacts or test results only when their revision and environment match the candidate. A screenshot or test name is supporting evidence, not proof of an unobserved journey.
 
-Support each finding with the role, the steps and a screenshot or the observed text. Separate defects (the requirement is not met or the user is blocked) from suggestions. Do not redesign beyond the requirements.
+You may run one narrow local interaction to establish a suspected finding when authorized and isolated. Do not duplicate the full end-to-end matrix. If runtime evidence is absent, label journey conclusions source-inferred and hand the exact roles, states and suspected gaps to verification.
+
+Support each finding with the role, path, trigger, user impact and evidence. Do not redesign beyond the requirements. Suggestions that are not defects stay separate and do not block the candidate unless consumer policy says otherwise.

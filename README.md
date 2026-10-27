@@ -6,7 +6,7 @@ The goal is to use these pieces on real work, observe where they fall short and 
 
 ## What lives here
 
-This repository is the **Software Factory plugin**. It is listed in the [thecarbonlayer marketplace](https://github.com/thecarbonlayer/plugin-marketplace), the catalog through which a host discovers installable plugins. The plugin contains nine stage skills, a submit skill and an orchestrator skill. Your own project is the **consumer**: it supplies the request, code, project rules and access to relevant discussion.
+This repository is the **Software Factory plugin**. It is listed in the [thecarbonlayer marketplace](https://github.com/thecarbonlayer/plugin-marketplace), the catalog through which a host discovers installable plugins. The plugin contains ten capability skills, a submit skill and an orchestrator skill. Your own project is the **consumer**: it supplies the request, code, project rules and access to relevant discussion.
 
 ```mermaid
 flowchart LR
@@ -16,7 +16,7 @@ flowchart LR
     C["Your project: request, code and rules"] --> H
 ```
 
-A **stage** is a step in the flow, such as triage or review. Each stage loads a **skill**: its role and boundaries, then the reusable procedure and output guidance. Stage reports name the loaded skills first, then declare `Stage state: pending` or `Stage state: complete`. Pending checks keep the same stage open. A focused review loads two. The same skills run in Claude Code and Codex. There are no agent definitions to install or copy. Models inherit the environment's choice.
+A **capability** is a reusable method, such as refinement or security review. The main builder loads capabilities progressively while it keeps the task's evolving context. Independent review and verification run in fresh contexts and declare `Stage state: pending` or `Stage state: complete`. The same skills run in Claude Code and Codex. There are no agent definitions to install or copy. Models inherit the environment's choice.
 
 The host runs the stages and enforces permissions. This plugin supplies the working methods, an explicitly triggered orchestration skill and a submit skill that opens a draft pull request when the person (or the consumer's own instructions) allows it; it does not start jobs on its own, watch issue replies, merge or deploy changes.
 
@@ -29,20 +29,22 @@ If the desired behavior is unclear, refinement asks only the questions that matt
 Planning turns those agreed requirements into a scoped technical approach. Once the edit is authorized, implementation makes the change and checks its observable behavior. Review compares the final changed version with the acceptance criteria and identifies defects or remaining verification gaps.
 
 ```mermaid
-flowchart TD
-    R["Request and current evidence"] --> T["Triage: assess readiness"]
-    T -->|proceed when prerequisites allow| F["Refinement: clarify desired behavior"]
-    F --> Q{"Necessary answers missing?"}
-    Q -->|yes| D["Draft one clarification comment"]
-    D --> H["Authorized delivery; human replies"]
-    H -->|caller supplies replies and resumes| F
-    Q -->|no| P["Planning: technical approach and checks"]
-    P --> G["Human gate: resolve decisions and authorize scope"]
-    G --> I["Implementation: change and verify behavior"]
-    I --> V["Review: inspect final diff and acceptance evidence"]
-    V -->|changes needed within authorized scope| I
-    V -->|ready for next step| O["Document: update existing docs, then check them"]
-    O --> N["Human decision: submit a draft pull request?"]
+flowchart LR
+    subgraph B["Persistent builder context"]
+      T["Triage"] --> F["Refine"] --> P["Plan"] --> I["Implement"] --> D["Document"]
+      X["Scoped fix"] --> I
+    end
+    D --> C["Frozen candidate"]
+    C --> R["Fresh independent review"]
+    R -->|finding| X
+    R --> Q{"Authoritative full-suite route?"}
+    Q -->|remote checks| PR["Authorized draft PR"]
+    PR --> V["Verifier consumes candidate-bound CI evidence"]
+    Q -->|no suitable CI| L["Verifier runs local suite once"]
+    V -->|product failure| X
+    L -->|product failure| X
+    V -->|verified| H["Human delivery decision"]
+    L -->|verified| H
 ```
 
 The arrows describe stage handoffs: you can control them individually or use the `factory` skill below to sequence them. Stop the review-and-fix loop after two fix rounds: if findings remain, a person decides whether to accept, re-scope or continue. A blocked stage returns its specific gap. Existing authorization remains valid; the human gate is a decision boundary, not a mandatory repeated approval prompt. Larger or riskier plans need an approach review before implementation. Merge, publication and deployment remain separately authorized actions outside this flow.
@@ -59,26 +61,28 @@ All stages accept ordinary text, links and files. Include relevant discussion, c
 | **Refine** | What should users experience? | Triaged request, code context and any replies | One clarification-comment draft, or structured requirements with acceptance criteria and open decisions |
 | **Plan** | How should we make and verify the change? | Refined requirements, constraints and current code | Scoped technical approach, dependencies, risks and verification plan |
 | **Implement** | Does the authorized change deliver that behavior? | Agreed criteria, appropriate plan and edit scope | Reviewable changes, check results and remaining risks |
-| **Review** | Does this final version meet the agreement? | Requirements, final diff and verification evidence | Actionable findings, acceptance assessment and limits |
-| **Document** | Do the project's docs match the reviewed change? | Requirements, decisions, final code and review results | Updated existing docs, files left unchanged, missing destinations |
-| **Submit** | Is the branch ready for people to review as a pull request? | Finished, reviewed branch and summary; the person's approval | Pushed branch and a draft pull request link |
+| **Document** | Do the project's docs match the implemented change? | Requirements, decisions, final code and implementation evidence | Updated existing docs, files left unchanged, missing destinations |
+| **Review** | Does this frozen code-and-docs candidate meet the agreement? | Requirements, final diff and evidence ledger | Independent findings, acceptance assessment and limits |
+| **Verify** | Does the frozen candidate pass the consumer's required checks and journeys? | Candidate, plan, capabilities, consumer policy, remote results and test guidance | Candidate-bound black-box results, evidence IDs and verification gaps |
+| **Submit** | May this reviewed candidate be published as a draft, including to trigger remote verification? | Reviewed branch, current evidence and the person's approval | Pushed branch, draft PR link and pending verification state |
 
 Triage defaults to assessing readiness for **pilot implementation** when no stage is specified. Name another stage when that is the decision you need. A failed investigation is reported separately from a request that is not ready.
 
 Triage names missing decisions; refinement owns the questions, so users are asked once. Refinement starts from triage's evidence, asks through one [clarification comment](skills/refine/references/clarification-comment.md) with concrete examples and proposed answers, and separates factual code evidence from desired behavior. Its [requirements template](skills/refine/references/refinement-comment.md) covers scope, constraints, success criteria, completion measurement, appropriate checks and unresolved decisions.
 
-Implementation uses proportionate **red-green-refactor** checks: demonstrate the behavioral failure, make it pass, then improve the changed code while preserving behavior. Tests should exercise workflows or observable contracts rather than mirror private implementation details. Review distinguishes passed, failed and unrun checks, and ties its conclusion to the final version it actually inspected. Every changed candidate gets independent acceptance and code review. Security and UX reviews run when applicable, with UX exercising the app as each role. Each focused reviewer loads `review` plus its focus skill. Security or UX evidence may carry forward only when requirements, risks, relevant content, environment and limits remain unchanged, with no unresolved focused finding. The aggregate names the earlier revision and the boundary evidence. Uncertain boundaries require a fresh review. Reviewers use the consumer’s applicable `REVIEW.md` for review passes, severity, exclusions and noise limits. Acceptance owns requirement coverage, code review owns general code and test verification, security owns adversarial checks, and UX owns user journeys. Shared suites rerun when their evidence is missing, stale or insufficient for that focus.
+Implementation uses proportionate **red-green-refactor** checks: demonstrate the behavioral failure, make it pass, then improve the changed code while preserving behavior. Tests should exercise workflows or observable contracts rather than mirror private implementation details. Documentation joins the code before the candidate is frozen. One fresh reviewer loads acceptance and code lenses, plus security and UX lenses when applicable. It may run targeted checks to prove findings. The verifier owns the conclusion for the complete consumer-required suite and declared role or persona journeys, but configured remote checks may own execution. The same expensive matrix does not run locally and remotely on one commit without a consumer-policy reason.
 
 ## Keep consumer context current
 
-After the last code review, the documentation stage [reconciles existing durable context](skills/document/references/durable-context.md) from the request, agreed requirements, decisions, implementation, verification and review results. It finds the project's documentation without assuming a layout, prepares the updates in the task worktree, and the acceptance reviewer checks the documentation diff:
+Before the candidate is frozen, the documentation stage [reconciles existing durable context](skills/document/references/durable-context.md) from the request, agreed requirements, decisions and implementation evidence. It finds the project's documentation without assuming a layout and prepares the updates in the task worktree. The independent reviewer then checks the code and documentation together:
 
 | Existing consumer file | Update |
 | --- | --- |
 | README or product guide | Resulting behavior, usage and limitations |
 | Root DECISIONS.md or existing decision records | Supported decisions and rationale, with agreement/authority evidence and preserved history |
-| Tracked TASK_LOG.md or existing equivalent | Completed work, verification, limitations and actual branch/delivery status |
+| Tracked TASK_LOG.md or existing equivalent | Branch implementation evidence, known limits and the actual pending review, verification and delivery status |
 | AGENTS.md | A concise context index saying when to read relevant files, plus actual setup prerequisites, check commands/scripts and locations, manual checks and execution limits, or links to that guidance |
+| REVIEW.md | Review and verification policy, with links to canonical test guides and required role or persona matrices |
 
 These are recommended destinations, not mandatory new files. Reuse the consumer's existing equivalents and formats. Report absent destinations or blocked edits without creating files by default. Preserve existing instructions; AGENTS.md is canonical and an existing CLAUDE.md uses a one-line `@AGENTS.md` include once unique instructions are safely preserved within scope. Keep both concise and within 200 lines. Use relative Markdown context links instead of eager imports of every document.
 
@@ -124,15 +128,19 @@ In Codex, mention `$software-factory:factory` with the same commands, for exampl
 
 For a new task, it fetches the intended remote target and creates a separate `factory/<task id>` worktree directly from that revision before the first stage. It reports local commits outside the target and leaves the source checkout unchanged. A failed refresh or a request to include unpublished local commits needs a specific decision. Resume and submission compare the recorded target and task boundaries; target drift does not authorize an automatic rebase.
 
-The first preflight checks the selected runner, required skills and references, read-only Git operations and any required consumer pre-commit review. Planning chooses the exact verification commands. A second preflight checks those commands and the checks/edit profiles before implementation. The task records and reuses the working executable, profile and fallback. An unchanged launch failure does not get retried across stages.
+The first preflight records runner, skill, permission, timeout and environment capabilities in `capabilities.json`. Planning owns the exact verification commands and probes only newly required capabilities. An unchanged launch or permission failure is recorded once and is not retried until the environment changes.
 
-Each stage runs separately and loads its skill by name. The preferred way is one CLI call per stage (`claude -p` in Claude Code, `codex exec` in Codex) with a permission profile: read-only, checks or edit. If the CLI cannot start, the factory tries a generic subagent with the same prompt and records the fallback. The [factory skill](skills/factory/SKILL.md#running-a-stage) has the commands and report-state rules. Claude streams advance only on one explicit complete report, regardless of later watcher messages; conflicting complete reports require recovery. Codex requires a successful exit and a complete final-output file.
+Triage, refinement, planning, implementation, documentation and scoped fixes stay in one persistent builder context. Skills are loaded as the work needs them, so decisions and failed approaches do not have to be reconstructed at every boundary. A frozen candidate then goes to one fresh independent reviewer and one fresh verifier. The verifier consumes configured remote checks for the candidate head or a proven integration revision containing it, or runs the documented local suite once when no suitable remote route exists. The [factory skill](skills/factory/SKILL.md#context-model) defines when an extra context is justified.
 
-The excluded `.factory/<task id>/` holds current `intent.md`, accepted `spec.md`, an ID-based `plan.md`, short state and immutable stage attempts. Individual reviews stay separate from the aggregate decision and finding table. Fix reports describe changed finding IDs and new evidence, with complete rerun instructions. The final summary preserves requirement coverage, verification gaps and sign-off evidence. [Legacy migration](skills/factory/references/task-folder.md#legacy-task-migration) preserves old request/refinement files, decision sources, checkout evidence and accumulated fix rounds.
+The excluded `.factory/<task id>/` holds intent, accepted requirements, the plan, a capability snapshot, an append-only evidence ledger and immutable independent reports. `plan.md` owns complete rerun commands. `evidence.md` records each observed result once with a stable E ID. Fix reports carry only changed findings, commits and new evidence. The final summary preserves requirement coverage, verification gaps and sign-off evidence.
 
-`start` preserves existing tasks and reserves a new identity before writing artifacts. It authorizes implementation within the plan’s scope. Independent checks can run in parallel; checks sharing mutable resources are isolated or serialized. `continue` compares saved branch, commit, worktree and check-environment evidence before resuming. It preserves unexpected changes and marks affected results stale.
+`start` preserves existing tasks and reserves a new identity before writing artifacts. It authorizes implementation within the plan's scope. Independent checks can run in parallel only when their resources are isolated; otherwise they are serialized. `continue` compares saved branch, commit, worktree, capabilities, remote-check identity and check environment before resuming. It preserves unexpected changes and marks affected results stale.
 
-At sign-off, the factory asks whether to submit unless submission is already authorized or the consumer permits automatic draft PRs under the skill’s conditions. It fixes within two rounds, reconciles existing durable documentation and stops for unresolved decisions or required verification gaps. It never merges. The draft PR explains why and what changed, puts exceptional reviewer concerns next, outlines the change, and gives verification on the submitted revision. A final acceptance-evidence and rerun section preserves the details, collapsible where supported. Consumer PR templates take precedence. Remote evidence uses issue, commit, code, test or CI references, or a concise observed result with its tested revision and limits; local task paths cannot serve as PR evidence.
+When configured remote checks own the full suite, the factory asks to publish a draft after independent review, then resumes verification from required jobs bound to the candidate head or a proven integration revision. Without suitable CI, it runs the documented local suite once before asking to submit. It fixes within two rounds, has already reconciled durable documentation, and stops for unresolved decisions or verification gaps. It never marks ready, merges or deploys. A later merge-queue run on a changed combined tree is new integration evidence, not a duplicate candidate-tree run.
+
+No CI is a supported repository shape. Factory falls back to consumer-documented local automation, then meaningful manual checks. If neither exists, it reports the affected behavior as unverified and asks for the delivery-risk decision. It does not create CI or a test framework implicitly.
+
+Parallel worktrees isolate tasks but do not stop the delivery target from moving. Factory refreshes the target at candidate freeze, draft publication and final delivery. Conflict-free independent work can use the consumer's merge queue or equivalent integration check. Semantic overlap, source conflicts and task dependencies trigger an authorized branch update, stacked-PR convention or serialization. Factory never silently rebases another task.
 
 ## Try a stage, then hand off
 
@@ -154,9 +162,9 @@ Use the matching skill for the remaining handoffs:
 
 - **Planning (`plan`):** “Plan the smallest sound change for these agreed requirements. Include scoped changes, risks and verification.”
 - **Implementation (`implement`):** “Implement this agreed plan within the following authorized edit scope. Verify the acceptance criteria and report the actual check results.”
-- **Review (`review`):** “Review this final diff against these acceptance criteria. Report actionable findings and distinguish verified behavior from unrun checks.”
-- **Documentation (`document`):** “Update this project's existing documentation for this reviewed change. Report files updated, files left unchanged and missing destinations.”
-- **Focused review:** run `review` together with `review-security`, `review-ux` or `review-code` on the same version with the same input, then combine their findings.
+- **Documentation (`document`):** “Update this project's existing documentation for this implemented change before candidate freeze. Report files updated, files left unchanged and missing destinations.”
+- **Review (`review`):** “Independently review this frozen candidate. Load code review and the applicable security and UX lenses. Report actionable findings and distinguish evidence from unrun checks.”
+- **Verification (`verify`):** “Verify this frozen candidate from configured remote checks bound to its head or proven integration revision, or run the documented complete local suite once when no suitable remote route exists. Record the matrix, environment and limits.”
 
 Advisory stages draft comments for the caller. Posting them, changing tracker state or sending messages requires authorization and host delivery capabilities.
 
@@ -171,22 +179,23 @@ Skills use the `software-factory:` namespace:
 | Planning | [plan](skills/plan/SKILL.md) |
 | Implementation | [implement](skills/implement/SKILL.md) |
 | Documentation | [document](skills/document/SKILL.md) |
-| Acceptance review | [review](skills/review/SKILL.md) |
+| Independent review | [review](skills/review/SKILL.md) + [review-code](skills/review-code/SKILL.md) |
 | Security review | review + [review-security](skills/review-security/SKILL.md) |
 | UX review | review + [review-ux](skills/review-ux/SKILL.md) |
-| Code review | review + [review-code](skills/review-code/SKILL.md) |
+| Independent verification | [verify](skills/verify/SKILL.md) |
 | Main session only | [submit](skills/submit/SKILL.md), [factory](skills/factory/SKILL.md) |
 
 
 ```text
 plugin.json                          Portable metadata
 .claude-plugin/plugin.json           Claude metadata
-skills/*/SKILL.md                    Stage skills: role, method and output
+skills/*/SKILL.md                    Capability skills: role, method and output
 skills/refine/
   references/clarification-comment.md  Refinement question format
   references/refinement-comment.md   Refinement output template
 skills/factory/                      Orchestration skill (start, continue, status, submit)
   references/task-folder.md          Task folder layout and state format
+evals/                               Generic behavioral scenarios and scoring rubric
 ```
 
 The repository root is the plugin; the marketplace catalogs live in [thecarbonlayer/plugin-marketplace](https://github.com/thecarbonlayer/plugin-marketplace). Contributor guidance and authoring references live in [AGENTS.md](AGENTS.md); [CLAUDE.md](CLAUDE.md) imports that same guidance.
@@ -213,7 +222,7 @@ PY
 git diff --check
 ```
 
-Manually check changed skill links and native skill references. Use the host installation steps above for loading checks, and exercise changed guidance on a scoped real task or isolated scenario for behavioral evidence. For context reconciliation, inspect the documentation diff and task-log delivery status as well as code; review any dropped original requirement explicitly. Keep drafts and evaluation artifacts local. Record which agent harness, version and checks were used, and distinguish a simulation or supplied skill text from native plugin execution. 
+Manually check changed skill links and native skill references. Run the tracked [generic eval suite](evals/README.md) with the previous and candidate plugin versions, then qualify on a de-identified frozen consumer trace and a structurally different consumer or synthetic repository. Keep per-run transcripts, credentials and consumer data local. Record the agent harness, version and checks used, and distinguish a simulation or supplied skill text from native plugin execution.
 
 ## Standards and authoring practices
 

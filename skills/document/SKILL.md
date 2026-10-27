@@ -1,17 +1,17 @@
 ---
 name: document
-description: Update a project's existing documentation after a reviewed change. Use when finished code needs its README, guides, decision records, task log or agent instructions brought up to date.
+description: Update a project's existing documentation before a candidate is frozen for independent review. Use when implemented behavior needs its README, guides, decision records, task log or agent instructions brought up to date.
 ---
 
 # Document
 
 ## Role and boundaries
 
-Keep the project's documentation true to the reviewed change. Find what the project already has, change only what is now wrong or missing, and never record a decision nobody agreed.
+Keep the project's documentation true to the implemented change so code and documentation can be reviewed as one candidate. Find what the project already has, change only what is now wrong or missing, and never record a decision nobody agreed.
 
 Edit documentation only, inside the caller's authorized edit scope. Do not change code or tests. Return the result to the caller. Publication, merges, deployment and external delivery need their own authorization.
 
-Use the original request/spec, agreed requirements and decisions with their sources, plan, final implementation report, review results and the authorized checkout. Do not assume a repository layout; find what this project actually has.
+Use the original request/spec, agreed requirements and decisions with their sources, plan, implementation evidence and the authorized checkout. If an earlier review exists from a fix round, use its still-relevant findings without treating it as approval of the new candidate. Do not assume a repository layout; find what this project actually has.
 
 When factory supplies `intent.md`, `spec.md` and `plan.md`, treat them as excluded local working artifacts. Standalone use may rely on equivalent supplied text. Preserve stable R/D IDs and explicit authority (**user-agreed**, **delegated implementation choice**, or **unresolved proposal**) in the evidence handoff. If supplied inputs lack IDs, assign stable IDs in the report with their sources; this does not establish agreement. The issue and PR are the shared task record; do not commit per-task intent, specification or plan copies to the consumer repository.
 
@@ -26,7 +26,7 @@ When factory supplies `intent.md`, `spec.md` and `plan.md`, treat them as exclud
 
 Follow [durable-context reconciliation](references/durable-context.md) for what belongs where and for decision records. Edit only statements the change makes wrong or incomplete, in each file's existing format and voice. Describe what the change provides; do not imply it has merged or shipped. Record only decisions already agreed or made within delegated authority, with their source, and preserve history. Keep unresolved proposals out of tracked files; report them as open decisions. Report missing destinations; do not create new files unless the caller authorizes it.
 
-Commit the documentation on the task branch when the caller permits, separate from code changes. Do not change code or tests. If a fact cannot be confirmed from the code, the requirements or the review evidence, leave it out and report it.
+Commit the documentation on the task branch when the caller permits, separate from code changes. Do not change code or tests. If a fact cannot be confirmed from the code, the requirements or implementation evidence, leave it out and report it. The factory freezes the candidate only after this reconciliation, then sends code and documentation through the same independent review.
 
 ## Return
 

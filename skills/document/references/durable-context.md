@@ -1,6 +1,6 @@
 # Durable project context
 
-Use this after the change has passed code review, to bring existing documentation up to date. Prepare documentation in the same authorized task worktree as the code. For a manual stage, use the caller's authorized checkout. Detailed drafts and review iterations stay in the locally excluded `.factory/<task-id>/` when factory is running, or in the caller's designated local artifacts for a manual stage.
+Use this after implementation and before the candidate is frozen for independent review. Prepare documentation in the same authorized task worktree as the code. For a manual stage, use the caller's authorized checkout. Detailed drafts and review iterations stay in the locally excluded `.factory/<task-id>/` when factory is running, or in the caller's designated local artifacts for a manual stage.
 
 The issue owns shared intent and clarified requirements when one exists, and the PR owns the shared delivery record. Local `intent.md`, `spec.md`, `plan.md`, intermediate reports and raw logs support resume and review. Do not commit per-task copies or task directories to the consumer repository. For ad hoc work without an issue, the PR carries the necessary intent and accepted scope. Existing durable project documents change only where the reviewed work changes knowledge those documents own.
 
@@ -12,14 +12,15 @@ Discover applicable `REVIEW.md` files. They own review passes, severity meanings
 
 ## Reconcile from the job's evidence
 
-Use the original request/spec, refinement and sourced replies, plan, final implementation, verification and review findings. Update only the durable facts supported by these artifacts:
+Use the original request/spec, refinement and sourced replies, plan, implementation evidence and any still-applicable findings from an earlier fix round. Update only the durable facts supported by these artifacts:
 
 | Existing destination | What belongs there |
 | --- | --- |
 | README or product guide | Resulting product behavior, usage and relevant limitations. Describe what the change provides; do not imply it has shipped. |
 | Decision records | Decisions actually agreed or made within the caller's delegated authority, with their source and rationale. Preserve prior entries. A proposed policy reversal needs explicit owner agreement; record an agreed supersession according to the project's format instead of rewriting history. |
-| Tracked task log | Concise completed work, task branch, verification results and remaining limitations. Distinguish work completed on the branch from reviewed, merged or deployed work. Preserve earlier entries; revise this job's entry as review or fixes change its result. |
+| Tracked task log | Concise branch implementation evidence, known limits and the actual pending review, verification and delivery status. Do not predict later results. Preserve earlier entries; revise this job's entry only when another authorized candidate must be frozen. |
 | AGENTS.md | Durable operating instructions and a concise context index, plus how to qualify/test the product. Link to REVIEW.md for review policy. Keep task history and per-run outcomes in the log and local artifacts. |
+| REVIEW.md | Required review and verification classes, severity and evidence policy. Link to canonical test guides and any complete role, persona or journey matrix instead of copying commands and identities into policy. |
 
 Ordinary implementation proposes new decision wording rather than changing recorded policy. **Durable-context reconciliation** may record a supported decision only when that documentation edit is in scope and the evidence establishes agreement or delegated decision authority. A recommendation in a plan, silence or a passing test is not agreement. Keep unresolved proposals in task artifacts and report them as open decisions.
 
