@@ -19,7 +19,7 @@ Commands take free text:
 ## Boundaries
 
 - **Files preserve task memory.** Keep local working artifacts in the excluded `.factory/<id>/`. The issue owns shared intent and discussion. The PR owns shared delivery evidence. Do not commit per-task planning artifacts to the consumer.
-- **The source checkout stays unchanged.** Create a separate `factory/<id>` worktree from the fetched delivery target. Never silently include unpublished source changes.
+- **The source checkout stays unchanged.** Create a separate `factory/<id>` worktree from the fetched delivery target. Never silently include unpublished source changes. A dedicated checkout that the host or consumer policy assigned to this task is already that isolation: use it and its assigned branch as the task worktree.
 - **People decide external actions and wider scope.** `start` authorizes implementation within the agreed plan. Posting, issue changes, pushing, PR creation, merge and deployment need their own authorization or an explicit consumer policy. Never merge or deploy.
 - **The plugin remains consumer-neutral.** Discover commands, roles, workflows and policy from the consumer repository. Do not encode a consumer's names, paths, accounts or product assumptions in Factory artifacts.
 
@@ -52,7 +52,7 @@ Record the reason. More contexts are not a default quality mechanism. Do not spl
 1. Resolve the source identity and search existing tasks, including legacy names. Resume a match. A new run needs an explicit distinct suffix.
 2. Reserve `.factory/<id>` atomically before writing. Record source branch, HEAD, status and dirty-content hashes in `checkout.json`. Add `.factory/` to the common repository's local exclude.
 3. Resolve and fetch the intended remote target. Record remote, target ref and fetched SHA. Report source-only commits and divergence. Do not use a stale local ref or unpublished commit as the base without a decision.
-4. Create `factory/<id>` in a separate worktree from the fetched SHA. Record branch, worktree, base and expected clean boundary.
+4. Create `factory/<id>` in a separate worktree from the fetched SHA. When the host or consumer policy gave this task a dedicated checkout and an assigned task branch, use those as the task worktree and branch instead, but only after confirming that the checkout is clean and holds no commits beyond the fetched SHA. If a check fails, report it and use the separate worktree. Record branch, worktree, base, expected clean boundary and which route was used.
 5. Discover applicable project instructions, `REVIEW.md`, setup and test guidance, durable documentation owners and protected resources. Write `intent.md` and initial `state.md`.
 6. Run capability discovery once. Save observed executables, profiles, skill access, allowed commands, timeout mechanism, fallback and environment constraints in `capabilities.json`. Prefer host-native time limits. Never assume GNU `timeout` exists. A denied or missing capability is recorded once and is retried only after a concrete environment change.
 7. On `continue`, compare the saved base, target, branch, HEAD, status, relevant inputs and environment with reality before resuming. Preserve unexpected changes. Mark dependent evidence stale rather than blessing the new state.

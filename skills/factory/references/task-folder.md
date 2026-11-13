@@ -22,6 +22,8 @@
 <main checkout>/../<repo>.factory/<id>/       separate worktree, branch factory/<id>
 ```
 
+When the host or consumer policy assigns the task a dedicated checkout and task branch, that checkout is the task worktree and no sibling worktree or `factory/<id>` branch is created. Use it only when it is clean and holds no commits beyond the fetched target; otherwise report the failed check and create the separate worktree. `checkout.json` records the route, and every later comparison uses the recorded branch and worktree, not a name pattern.
+
 The issue owns shared intent, discussion and clarification. The PR owns shared delivery evidence. These local files preserve working state and recovery evidence. Do not commit a second per-task intent, specification or plan tree to the consumer. Existing durable documents change only when the implementation changes knowledge they own.
 
 ## Artifact ownership
