@@ -65,4 +65,6 @@ Starting or continuing an authorized Factory task in this repository grants stan
 
 That standing authority does not cover marking the pull request ready, approval, merge or deployment. After required local behavioral qualification and the candidate-bound PR-quality result support delivery, Factory stops for a person's decision on those actions.
 
-After merge, refresh the marketplace, install the released plugin and confirm the installed version before starting the next Factory task. A task already in progress keeps the release it started with.
+After a merge that changes the plugin version, the `Release tag` workflow tags the merge commit `v<version>`, for example `v0.10.0`. It creates a tag only when that version has none. The marketplace catalog follows the default branch, so each merge becomes the installed release for new sessions. The tag is the fixed point that names a release and the way back to a known-good one: if a release cannot operate tasks safely, point the catalog entry at the last good tag, where the host's catalog format accepts a ref, until a repaired version merges.
+
+Then refresh the marketplace, install the released plugin and confirm the installed version before starting the next Factory task. A task already in progress keeps the release it started with.

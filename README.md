@@ -128,7 +128,7 @@ The `factory` skill runs the whole sequence from the main session, which owns st
 
 In Codex, mention `$software-factory:factory` with the same commands, for example `$software-factory:factory start <issue>`.
 
-For a new task, it fetches the intended remote target and creates a separate `factory/<task id>` worktree directly from that revision before the first stage. It reports local commits outside the target and leaves the source checkout unchanged. A failed refresh or a request to include unpublished local commits needs a specific decision. Resume and submission compare the recorded target and task boundaries; target drift does not authorize an automatic rebase.
+For a new task, it fetches the intended remote target and creates a separate `factory/<task id>` worktree directly from that revision before the first stage. It reports local commits outside the target and leaves the source checkout unchanged. When the host or your policy assigns the task a dedicated, clean checkout and task branch at the fetched target, as a hosted agent session does, Factory uses those as the task worktree and branch and creates no second worktree. A failed refresh or a request to include unpublished local commits needs a specific decision. Resume and submission compare the recorded target and task boundaries; target drift does not authorize an automatic rebase.
 
 The first preflight records runner, skill, permission, timeout and environment capabilities in `capabilities.json`. Planning owns the exact verification commands and probes only newly required capabilities. An unchanged launch or permission failure is recorded once and is not retried until the environment changes.
 
