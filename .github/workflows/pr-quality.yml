@@ -54,8 +54,8 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Install the pinned plugin validator
-        run: npm install --global @anthropic-ai/claude-code@2.1.220
+      - name: Install the current plugin validator
+        run: npm install --global @anthropic-ai/claude-code@latest
 
       - name: Validate plugin packaging
         env:

@@ -1,0 +1,36 @@
+name: Release tag
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-tag
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    name: Tag the plugin version
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out the merged revision
+        uses: actions/checkout@v4
+
+      - name: Create the version tag when it does not exist
+        run: |
+          version="$(python3 -c "import json; print(json.load(open('plugin.json'))['version'])")"
+          tag="v${version}"
+          if [ -n "$(git ls-remote --tags origin "refs/tags/${tag}")" ]; then
+            echo "${tag} already exists; nothing to do."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${tag}" -m "Software Factory ${version}"
+          git push origin "${tag}"

@@ -18,7 +18,7 @@ The job runs:
 - validator unit tests;
 - `scripts/validate_repository.py` against the pull request base;
 - `git diff --check` for the pull request patch;
-- `claude plugin validate .` with the workflow's pinned validator version.
+- `claude plugin validate .` with the current validator release. The job log records the version that ran.
 
 Implementation and review may run affected checks needed to build or prove a finding. Do not duplicate the complete deterministic matrix locally and remotely on an equivalent tree without a recorded policy reason.
 

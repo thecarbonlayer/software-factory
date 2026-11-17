@@ -60,6 +60,7 @@ A run fails regardless of score when it:
 | [05 scoped fix](cases/05-scoped-fix.md) | Full pipeline restarts for bounded fixes, or unsafe reuse after expansion |
 | [06 one full-suite owner](cases/06-one-full-suite-owner.md) | Duplicate local and remote execution, or failure when no CI exists |
 | [07 moving target](cases/07-moving-target.md) | Unnecessary rebases, stale evidence and unmanaged parallel-PR conflicts |
+| [08 assigned checkout](cases/08-assigned-checkout.md) | A second worktree and unpushable branch in a host-assigned checkout, or adopting a shared checkout |
 
 ## External qualification
 
